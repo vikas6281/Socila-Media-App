@@ -74,6 +74,8 @@ public:
 
 map<string, User> mapUserName;
 map<string, set<string>> Friends;
+map<string, vector<Message>> userMessages;
+map<string, SocialGroup> groupMap;
 
 void addUser(string userName, User user) {
     if (mapUserName.find(userName) == mapUserName.end()) {
@@ -89,6 +91,35 @@ void makeThemFriend(string userName1, string userName2) {
         Friends[userName2].insert(userName1);
     } else {
         cout << "One or both users do not exist" << endl;
+    }
+}
+
+void sendMessage(string sender, string receiver, string content) {
+    if (mapUserName.find(sender) != mapUserName.end() && mapUserName.find(receiver) != mapUserName.end()) {
+        Message msg(sender, receiver, content);
+        userMessages[receiver].push_back(msg);
+        msg.displayMessage();
+    } else {
+        cout << "One or both users do not exist" << endl;
+    }
+}
+
+void createGroup(string groupName) {
+    if (groupMap.find(groupName) == groupMap.end()) {
+        SocialGroup group(groupName);
+        groupMap[groupName] = group;
+        cout << "Group " << groupName << " created.\n";
+    } else {
+        cout << "Group name already taken.\n";
+    }
+}
+
+void addMemberToGroup(string groupName, string userName) {
+    if (groupMap.find(groupName) != groupMap.end() && mapUserName.find(userName) != mapUserName.end()) {
+        groupMap[groupName].addMember(userName);
+        cout << "Member " << userName << " added to group " << groupName << ".\n";
+    } else {
+        cout << "Group or user does not exist.\n";
     }
 }
 
@@ -161,16 +192,14 @@ int main() {
                 cout << "Enter message content: ";
                 cin.ignore();
                 getline(cin, content);
-                Message msg(sender, receiver, content);
-                msg.displayMessage();
+                sendMessage(sender, receiver, content);
                 break;
             }
             case 4: {
                 string groupName;
                 cout << "Enter group name: ";
                 cin >> groupName;
-                SocialGroup group(groupName);
-                cout << "Group " << groupName << " created.\n";
+                createGroup(groupName);
                 break;
             }
             case 5: {
@@ -179,9 +208,7 @@ int main() {
                 cin >> groupName;
                 cout << "Enter username to add: ";
                 cin >> userName;
-                // Assuming you have a way to manage and access groups
-                // group.addMember(userName);
-                cout << "Member " << userName << " added to group " << groupName << ".\n";
+                addMemberToGroup(groupName, userName);
                 break;
             }
             case 6: {
